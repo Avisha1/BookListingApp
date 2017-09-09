@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Book Listing</string>
+    <string name="BookObjectIntentKey">myBooks</string>
+    <string name="no_data_to_fetch">No data to fetch :/</string>
 </resources>
