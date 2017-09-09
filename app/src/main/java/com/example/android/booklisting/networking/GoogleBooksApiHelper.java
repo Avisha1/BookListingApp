@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+
 import android.text.TextUtils;
 
 public class GoogleBooksApiHelper {
@@ -108,26 +109,30 @@ public class GoogleBooksApiHelper {
                     String description = "";
 
                     //get info specific to the book
-                    JSONObject volumeInfo =  booksArray.getJSONObject(i).getJSONObject("volumeInfo");
-                    title =volumeInfo.getString("title");
-                    publishedDate = volumeInfo.getString("publishedDate");
+                    JSONObject volumeInfo = booksArray.getJSONObject(i).getJSONObject("volumeInfo");
 
-                    //get the authors from the array (there might be several)
-                    StringBuilder authorsBuilder = new StringBuilder();
-                    JSONArray authorsArray = volumeInfo.getJSONArray("authors");
-                    for (int j = 0; j < authorsArray.length(); j++) {
-                        authorsBuilder.append(authorsArray.get(j));
-                        authorsBuilder.append(" ");
-                    }
-                    authors = authorsBuilder.toString();
+                    if (volumeInfo.has("title") && volumeInfo.has("publishedDate") && volumeInfo.has("authors")) {
 
-                    try {
-                        description = volumeInfo.getString("description");
-                    } catch (JSONException e) {
-                        System.out.println("JSONException thrown - there's no description");
-                        e.printStackTrace();
+                        title = volumeInfo.getString("title");
+                        publishedDate = volumeInfo.getString("publishedDate");
+
+                        //get the authors from the array (there might be several)
+                        StringBuilder authorsBuilder = new StringBuilder();
+                        JSONArray authorsArray = volumeInfo.getJSONArray("authors");
+                        for (int j = 0; j < authorsArray.length(); j++) {
+                            authorsBuilder.append(authorsArray.get(j));
+                            authorsBuilder.append(" ");
+                        }
+                        authors = authorsBuilder.toString();
+
+                        try {
+                            description = volumeInfo.getString("description");
+                        } catch (JSONException e) {
+                            System.out.println("JSONException thrown - there's no description");
+                            e.printStackTrace();
+                        }
+                        bookList.add(new Book(title, authors, publishedDate, description));
                     }
-                    bookList.add(new Book(title, authors, publishedDate, description));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
