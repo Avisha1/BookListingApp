@@ -1,12 +1,16 @@
 package com.example.android.booklisting.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.android.booklisting.R;
 import com.example.android.booklisting.data_objects.Book;
@@ -16,8 +20,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button searchButton;
-    EditText edtTextSearch;
+    private Button searchButton;
+    private EditText edtTextSearch;
+
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         searchButton = (Button) findViewById(R.id.button);
         edtTextSearch = (EditText)findViewById(R.id.editTextSearchBook);
 
+        context = this;
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -38,11 +45,29 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void searchBook(View view){
-        //get text from EditText
-        String query = edtTextSearch.getText().toString();
 
-        //send it to async task
-        new SearchBookAsync().execute(query, null, "");
+        if(checkInternetConnection()) {
+            //get text from EditText
+            String query = edtTextSearch.getText().toString();
+
+            //send it to async task
+            new SearchBookAsync().execute(query, null, "");
+        }
+        else{
+            Toast.makeText(this, "Can't perform this action when there is no internet connection", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private Boolean checkInternetConnection(){
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        return isConnected;
     }
 
     public void goToBookActivity(ArrayList<Book> list){
